@@ -28,8 +28,11 @@ void pausa(void);
 char *tableGen(tableData *tab);
 void *threadTable(void *arg);
 void printTable(char *tab);
+void dashWord(char **word);
 /* int strmax(void); */
+void exitProgram(void);
 Queue readLtrFile(void);
 bool checkInput(tableData *tab, char *sol);
+bool compareSol(char *word, tableData *tbl);
 
 #endif

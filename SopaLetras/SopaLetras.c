@@ -2,8 +2,8 @@
 #include <stdint.h>
 #include <inttypes.h>
 #include <pthread.h>
-#include "src/inc/letras_func.h"
-#include "src/inc/data_struct_func.h"
+#include "letras_func.h"
+#include "data_struct_func.h"
 
 int
 main(void) {
@@ -27,6 +27,8 @@ main(void) {
     } while (status);
 
     puts("Gracias por jugar");
+
+    free(tab.table);
     
     return 0;
 }

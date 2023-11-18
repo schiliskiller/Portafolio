@@ -19,6 +19,7 @@
               " /                             \n" \
 
 /* In general terms... */
+typedef enum { FALSE, TRUE } Bool;
 struct node {
     char *string;
     unsigned int pos;
@@ -37,6 +38,8 @@ void printStack(Stack strct);
 typedef struct node* Queue;
 typedef struct node** DirectQueue;
 
+Bool isEmpty(DirectStack stck);
+Bool isFull(DirectStack stck);
 void enqueue(DirectQueue queue, DirectQueue head, char * value);
 char *dequeue(DirectQueue queue, DirectQueue headNode);
 void enque(DirectQueue queue, DirectQueue headNode, char * value1, char * value2);

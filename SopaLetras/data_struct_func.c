@@ -3,7 +3,15 @@
 #include <string.h>
 #include "data_struct_func.h"
 
+
 /* Stack */
+/* Bool */
+/* isEmpty(DirectStack stck) { */
+
+/* } */
+
+/* Bool isFull(DirectStack stck); */
+
 void
 pop(DirectStack stck) {
     Stack prev = (*stck)->next;
@@ -13,7 +21,7 @@ pop(DirectStack stck) {
 }
 
 void
-push(DirectStack stck, char * value) {
+push(DirectStack stck, char *value) {
     Stack newNode;
 
     CREATE_NODE(newNode, sizeof(struct node));
@@ -34,7 +42,7 @@ printStack(Stack strct) {
 /* Queue */
 
 void
-enqueue(DirectQueue newQueue, DirectQueue headNode, char * value) {
+enqueue(DirectQueue newQueue, DirectQueue headNode, char *value) {
     Queue newTail;
 
     CREATE_NODE(newTail, sizeof(struct node));
@@ -47,7 +55,20 @@ enqueue(DirectQueue newQueue, DirectQueue headNode, char * value) {
 }
 
 void
-enque(DirectQueue queue, DirectQueue headNode, char * value1, char * value2) {
+enqueueDouble(DirectQueue newQueue, DirectQueue headNode, char *value) {
+    Queue newTail;
+
+    CREATE_NODE(newTail, sizeof(struct node));
+
+    newTail->string = value;
+    newTail->next = *newQueue;
+    *headNode = !*newQueue ? newTail : *headNode;
+
+    *newQueue = newTail;
+}
+
+void
+enque(DirectQueue queue, DirectQueue headNode, char *value1, char *value2) {
     Queue newTail, newHead;
 
     CREATE_NODE(newTail, sizeof(struct node));
@@ -113,7 +134,7 @@ printQueue(Queue queue) {
 
 /* Linked Lists */
 void
-insertNode(DirectList list, char * n) {
+insertNode(DirectList list, char *n) {
     List newNode;
 
     CREATE_NODE(newNode, sizeof(struct node));
@@ -134,7 +155,7 @@ printList(List p) {
 }
 
 void
-deleteNode(List list, char * n) {
+deleteNode(List list, char *n) {
     List p;
     for (p = list;
          p && p->string != n;
@@ -149,7 +170,7 @@ deleteNode(List list, char * n) {
 }
 
 List
-findNode(List list, char * n) {
+findNode(List list, char *n) {
     while (list->string != n)
         list = list->next;
 

@@ -11,14 +11,21 @@
 #include "data_struct_func.h"
 
 int locations[M] = {0};
+uint8_t assigned = 0;
 Queue head;
-unsigned int assigned = 0;
+char *wordTrack;
 
 void
 init(void) {
+    system("clear||cls");
     printf(ABOUT);
     printf("( Presione Enter para empezar...");
     getchar();
+}
+
+void
+exitProgram(void) {
+    free(wordTrack);
 }
 
 void
@@ -29,6 +36,25 @@ menu(void) {
 #endif
     puts("[0] Salir\n");
     printf("$ ");
+}
+
+void
+dashWord(char **word) {
+    char *dashtr;
+
+    if (!(dashtr = malloc(strlen(*word)))) {
+        fprintf(stderr, "ERROR: no space available\n");
+        return;
+    }
+
+    strcpy(dashtr, "");
+
+    for (char *i = *word;
+         i < *word + strlen(*word);
+         strcat(dashtr, "-"), i++)
+        ;
+
+    strcpy(*word, dashtr);
 }
 
 uint8_t
@@ -55,15 +81,28 @@ options(uint8_t op, tableData tab) {
             break;
 #if DEBUG == 1
         case 2:
-            for (char **i = tab.words; i < tab.words + M; i++)
-                printf("%lu - %s\n", i - tab.words + 1, *i);
+            tab.words = readLtrFile();
+
+            for (Queue i = tab.words; head->pos <= M - 1; ) {
+                uint8_t n = head->pos;
+
+                if (locations[head->pos] == -1)
+                    dashWord(&head->string);
+
+                printf("%d - %s\n", n + 1, dequeue(&i, &head));
+            }
             putchar('\n');
             pausa();
             break;
 #endif
         case 0:
             puts("Hasta luego!");
+            exitProgram();
             exit(EXIT_SUCCESS);
+        default:
+            printf("Elija otra opcion.\n\n");
+            pausa();
+            break;
     }
 
     return 1;
@@ -80,9 +119,27 @@ void
 printTable(char *tab) {
     for (char *i = tab; i < tab + N * N; i++) {
         printf("%c ", *i);
-        if (!((int) (i - tab + 1) % N)) putchar('\n');
+        if (!((uint8_t) (i - tab + 1) % N)) putchar('\n');
     }
     putchar('\n');
+}
+
+bool
+compareSol(char *word, tableData *tbl) {
+    static uint8_t i = 0;
+    
+    if (*(word + i) == *(tbl->table + locations[head->pos] + i))
+        tbl->table[i + locations[head->pos]] = '-';
+    else
+        return false;
+
+    if (++i < strlen(word))
+        compareSol(word, tbl);
+
+    locations[head->pos] = -1;
+    i = 0;
+
+    return true;
 }
 
 bool
@@ -91,22 +148,12 @@ checkInput(tableData *tab, char *sol) {
 
     tab->words = readLtrFile();
     
-    while (head->pos < M && strcmp(sol, head->string))
+    while (head->pos < M - 1 && strcmp(sol, head->string))
         dequeue(&tab->words, &head);
     
     if (tab->words == NULL) comp = false;
     
-    if (comp) {
-        int i = 0;
-
-        while (i < strlen(head->string)) {
-            if (*(sol + i) == *(tab->table + locations[head->pos] + i)) {
-                tab->table[i + locations[head->pos]] = '-';
-                *(head->string + i++) = '-';
-            }
-            else { comp = false; break; }
-        }
-    } 
+    if (comp) comp = compareSol(sol, tab);
     
     free(tab->words);
 
@@ -130,11 +177,13 @@ char
 
         if (letter < 'A' || letter > 'Z') {i--; continue;}
 
-        if ((tbl[i-1] == letter || !((int) letter % 40)) && head->pos <= M - 1) {
+        if ((tbl[i-1] == letter || !((uint8_t) letter % 40)) && head->pos <= M - 1) {
             locations[head->pos] = i;
-            assigned++;       
-            char str[50];
+
+            char str[strlen(head->string) + 1];
             strcpy(str, dequeue(&tab->words, &head));
+
+            assigned++;       
             
             for (char *k = str; k < str + strlen(str);  k++)
                 tbl[i++] = *k;
@@ -180,10 +229,9 @@ Queue
 readLtrFile(void) {
     FILE *ltr;
     Queue wrds = NULL;
-    char *word;
-    unsigned int i = 0;
+    uint8_t i = 1;
 
-    if (!(word = malloc(128))) {
+    if (!(wordTrack = malloc(128))) {
         fprintf(stderr, "ERROR: no space available\n");
         return NULL;
     }
@@ -193,17 +241,15 @@ readLtrFile(void) {
         return NULL;
     }
 
-    fscanf(ltr, " %[^\n]", word);
-    word = realloc(word, strlen(word) + 1);
+    fscanf(ltr, " %[^\n]", wordTrack);
+    wordTrack = realloc(wordTrack, strlen(wordTrack) + 1);
 
-    /* wrds[i++] = strtok(NULL, " "); */
-    enqueue(&wrds, &head, strtok(word, " "));
-    wrds->pos = i++;
+    enqueue(&wrds, &head, strtok(wordTrack, " "));
+    wrds->pos = 0;
     while (wrds->pos < M - 1) {
         enqueue(&wrds, &head, strtok(NULL, " "));
         wrds->pos = i++;
     }
-        /* wrds[i++] = strtok(NULL, " "); */
 
     fclose(ltr);
 
